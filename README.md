@@ -10,7 +10,7 @@ O **SaaS Validator** foi criado para te dar aquele choque de realidade que seus 
 
 ## 🏗️ A Gloriosa (e Preguiçosa) Jornada Tecnológica
 
-Este projeto nasceu puro, inocente e cheio de esperança, como um `npm create vite@latest` em uma tarde de domingo. A ideia era simples: um front-end em React, um campo de texto e uma chamada de API. Lindo.
+Este projeto nasceu puro, inocente e cheio de esperança, como um `npm create vite@latest` em uma madrugada de domingo. A ideia era simples: um front-end em React, um campo de texto e uma chamada de API. Lindo.
 
 Foi então que o único neurônio funcional do meu cérebro disparou um alerta de pânico:
 **"Onde exatamente você vai colocar a API key da OpenAI, gênio?"**
