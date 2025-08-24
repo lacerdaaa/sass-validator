@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react";
 
 type ChatMessage = {
@@ -7,7 +8,7 @@ type ChatMessage = {
   isTyping?: boolean;
 };
 
-export default function SaasValidator() {
+export default function Page() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
