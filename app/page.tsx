@@ -123,11 +123,13 @@ export default function Page() {
       <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
               <span className="text-white text-sm font-bold">S</span>
             </div>
-            <h1 className="text-xl font-semibold text-gray-900">SaaS Validator</h1>
-            <span className="text-xs text-gray-500 font-medium ml-2">Honestity as a Service</span>
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">SaaS Validator</h1>
+              <span className="text-xs text-gray-500 font-medium block">Honestity as a Service</span>
+            </div>
           </div>
           {!showForm && (
             <button
@@ -265,7 +267,7 @@ export default function Page() {
 
         <footer className="text-center text-sm text-gray-500 py-4">
           <div>
-            feito com <span className="line-through">amor</span> sarcasmo por{" "}
+            feito com <span className="line-through">amor</span> humor por{" "}
             <a
               href="https://github.com/lacerdaaa"
               target="_blank"
