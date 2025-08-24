@@ -29,7 +29,7 @@ export default function Page() {
         clearInterval(timer);
         if (callback) callback();
       }
-    }, 30);
+    }, 20);
   };
 
   const submit = async () => {
@@ -43,7 +43,7 @@ export default function Page() {
     const userMessage: ChatMessage = {
       id: Date.now(),
       type: 'user',
-      content: `Minha ideia que vai me deixar milionário, :\n\n${title || "Sem título"}\n\n${description}`
+      content: `Valide a ideia que vai me deixar milionário ( nos meus sonhos ):\n\n${title || "Sem título"}:\n${description}`
     };
 
     setMessages(prev => [...prev, userMessage]);
