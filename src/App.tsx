@@ -22,7 +22,7 @@ export default function SaasValidator() {
       {
         role: "system",
         content:
-          "You are a deliberately biased, sarcastic, and humorous AI called the 'SaaS Validator'. Your job is to judge SaaS ideas quickly and with personality. Be concise, witty, and occasionally harsh — but provide one practical suggestion to actually improve the idea. Do not be abusive or hateful. Keep responses under 220 words. Response in PT-BT."
+          "You are a deliberately biased, sarcastic, and humorous AI called the 'SaaS Validator'. Your job is to judge SaaS ideas quickly and with personality. Be concise, witty, and occasionally harsh — but provide one practical suggestion to actually improve the idea. Do not be abusive or hateful. Keep responses under 220 words. Response in PT-BR."
       },
       {
         role: "user",
@@ -42,36 +42,26 @@ export default function SaasValidator() {
 
     setLoading(true);
     try {
-      const messages = buildPrompt(title, description, tone);
-
-      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer`,
+          "Authorization": `Bearer `,
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages,
-          max_tokens: 450,
-          temperature: Math.min(1.2, 0.1 + (tone / 10) * 1.1),
-        }),
+          model: "gpt-3.5-turbo",
+          messages: buildPrompt(title, description, tone),
+          max_tokens: 512,
+          temperature: 0.8
+        })
       });
 
-      if (!resp.ok) {
-        const text = await resp.text();
-        throw new Error(`Erro do servidor: ${resp.status} ${text}`);
+      if (!response.ok) {
+        throw new Error("Falha ao conectar à API.");
       }
 
-      const data = await resp.json();
-
-      let assistantText = "";
-      if (data.reply) assistantText = data.reply;
-      else if (data.choices && data.choices[0] && data.choices[0].message)
-        assistantText = data.choices[0].message.content;
-      else if (data.output && data.output[0] && data.output[0].content)
-        assistantText = data.output[0].content[0].text;
-      else assistantText = JSON.stringify(data);
+      const data = await response.json();
+      const assistantText = data.choices?.[0]?.message?.content || "Sem resposta da IA.";
 
       const entry: Entry = {
         id: Date.now(),
@@ -105,111 +95,206 @@ export default function SaasValidator() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <div className="bg-gradient-to-r from-slate-900 via-purple-800 to-sky-700 text-white rounded-2xl p-6 shadow-2xl">
-        <h1 className="text-3xl font-extrabold">SaaS Validator</h1>
-        <p className="mt-2 text-sm opacity-90">Uma IA sarcástica (mas útil) que 'julga' ideias de SaaS — diversão para devs e founders.</p>
-
-        <div className="mt-6 grid grid-cols-1 gap-4">
-          <input
-            className="w-full rounded-md p-3 text-slate-800"
-            placeholder="Nome da ideia (ex: 'ZapShip: entregas sob demanda para pets')"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-
-          <textarea
-            className="w-full min-h-[120px] rounded-md p-3 text-slate-800"
-            placeholder="Descrição curta da ideia (problema que resolve, público, diferencial)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-
-          <div className="flex items-center gap-4">
-            <label className="text-sm">Nível de sarcasmo</label>
-            <input
-              type="range"
-              min={1}
-              max={10}
-              value={tone}
-              onChange={(e) => setTone(Number(e.target.value))}
-            />
-            <div className="ml-auto text-sm">{tone}/10</div>
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              onClick={submit}
-              disabled={loading}
-              className="bg-white text-slate-900 px-4 py-2 rounded-md font-semibold hover:scale-105 transition disabled:opacity-60"
-            >
-              {loading ? "Julgando..." : "Verificar ideia"}
-            </button>
-
-            <button
-              onClick={() => { setTitle(""); setDescription(""); }}
-              className="border border-white/30 px-4 py-2 rounded-md text-sm hover:bg-white/5"
-            >
-              Limpar
-            </button>
-          </div>
-
-          {error && (
-            <div className="bg-red-600/80 p-3 rounded-md text-white text-sm">{error}</div>
-          )}
-        </div>
-      </div>
-
-      <div className="mt-6">
-        <h2 className="text-lg font-bold">Resultado</h2>
-
-        {!result && (
-          <div className="mt-3 text-sm text-slate-600">Ainda não tem julgamento — mande uma ideia!</div>
-        )}
-
-        {result && (
-          <div className="mt-3 p-4 rounded-lg border">
-            <div className="flex items-start gap-4">
-              <div className="flex-1">
-                <div className="font-semibold">{result.title}</div>
-                <div className="text-sm mt-1 whitespace-pre-wrap">{result.reply}</div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900">
+      <div className="max-w-4xl mx-auto p-6">
+        {/* Header com animação */}
+        <div className="relative overflow-hidden bg-black/40 backdrop-blur-sm border border-white/10 rounded-3xl p-8 mb-8">
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10"></div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-2xl flex items-center justify-center">
+                <span className="text-2xl font-black text-white">🤖</span>
               </div>
-              <div className="flex flex-col gap-2">
-                <button
-                  className="text-sm border px-3 py-1 rounded-md"
-                  onClick={() => copyResult(result.reply)}
-                >Copiar</button>
-                <button
-                  className="text-sm border px-3 py-1 rounded-md"
-                  onClick={() => navigator.clipboard.writeText(JSON.stringify(result))}
-                >Salvar JSON</button>
+              <div>
+                <h1 className="text-4xl font-black tracking-tight text-white" style={{ fontFamily: 'ui-monospace, monospace' }}>
+                  SAAS.VALIDATOR
+                </h1>
+                <p className="text-cyan-300/80 font-mono text-sm tracking-wider">
+                  ▸ BRUTAL.HONESTY.AS.A.SERVICE
+                </p>
               </div>
             </div>
+            <p className="text-white/70 font-mono text-sm max-w-2xl">
+              Uma IA sarcástica que julga suas ideias de SaaS sem dó nem piedade.
+              Prepare-se para a verdade nua e crua (mas útil).
+            </p>
           </div>
-        )}
-
-        <div className="mt-6">
-          <h3 className="font-semibold">Histórico</h3>
-          {history.length === 0 && <div className="text-sm text-slate-500 mt-2">Nenhum histórico ainda — suas ideias aparecerão aqui.</div>}
-          <ul className="mt-3 space-y-2">
-            {history.map(h => (
-              <li key={h.id} className="p-3 border rounded-md bg-white/5">
-                <div className="flex justify-between items-start gap-3">
-                  <div>
-                    <div className="font-medium">{h.title}</div>
-                    <div className="text-xs text-slate-400">Sarcasmo: {h.tone}/10</div>
-                    <div className="text-sm mt-2 whitespace-pre-wrap">{h.reply.slice(0, 220)}{h.reply.length > 220 ? "..." : ""}</div>
-                  </div>
-                  <div className="text-xs text-slate-400">{new Date(h.id).toLocaleString()}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
         </div>
 
-      </div>
+        {/* Form */}
+        <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl p-6 mb-8">
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="block text-white/90 font-mono text-sm font-bold tracking-wider">
+                › NOME.DA.IDEIA
+              </label>
+              <input
+                className="w-full bg-white/5 border border-white/20 rounded-xl p-4 text-white font-mono placeholder-white/40 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 transition-all"
+                placeholder="ex: UberForCats - transporte premium para felinos"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
 
-      <footer className="mt-8 text-center text-xs text-slate-500">SaaS Validator — uma brincadeira para founders. Use com responsabilidade 😉</footer>
+            <div className="space-y-2">
+              <label className="block text-white/90 font-mono text-sm font-bold tracking-wider">
+                › DESCRIÇÃO.DETALHADA
+              </label>
+              <textarea
+                className="w-full min-h-[140px] bg-white/5 border border-white/20 rounded-xl p-4 text-white font-mono placeholder-white/40 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 transition-all resize-none"
+                placeholder="Descreva o problema, público-alvo, diferencial... seja específico!"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <label className="block text-white/90 font-mono text-sm font-bold tracking-wider">
+                › NÍVEL.DE.SARCASMO [{tone}/10]
+              </label>
+              <div className="relative">
+                <input
+                  type="range"
+                  min={1}
+                  max={10}
+                  value={tone}
+                  onChange={(e) => setTone(Number(e.target.value))}
+                  className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, #06b6d4 0%, #06b6d4 ${tone * 10}%, rgba(255,255,255,0.1) ${tone * 10}%, rgba(255,255,255,0.1) 100%)`
+                  }}
+                />
+                <div className="flex justify-between text-xs font-mono text-white/50 mt-2">
+                  <span>SUAVE</span>
+                  <span>DESTRUIÇÃO</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-4 pt-4">
+              <button
+                onClick={submit}
+                disabled={loading}
+                className="flex-1 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-mono font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] disabled:scale-100 disabled:opacity-50"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    PROCESSANDO...
+                  </span>
+                ) : (
+                  "JULGAR.IDEIA"
+                )}
+              </button>
+
+              <button
+                onClick={() => { setTitle(""); setDescription(""); }}
+                className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-mono font-bold py-4 px-6 rounded-xl transition-all"
+              >
+                RESET
+              </button>
+            </div>
+
+            {error && (
+              <div className="bg-red-500/20 border border-red-500/30 rounded-xl p-4">
+                <div className="text-red-300 font-mono text-sm">❌ {error}</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        =        <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl p-6 mb-8">
+          <h2 className="text-white font-mono font-bold text-xl tracking-wider mb-4">
+            › VEREDICTO.FINAL
+          </h2>
+
+          {!result && (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">⚖️</div>
+              <div className="text-white/50 font-mono">Aguardando julgamento...</div>
+            </div>
+          )}
+
+          {result && (
+            <div className="bg-gradient-to-r from-white/5 to-white/10 border border-white/20 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-lg">🔥</span>
+                </div>
+                <div className="flex-1 space-y-3">
+                  <div className="font-mono font-bold text-white text-lg">
+                    {result.title}
+                  </div>
+                  <div className="text-white/80 font-mono text-sm leading-relaxed whitespace-pre-wrap">
+                    {result.reply}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs font-mono text-white/50">
+                    <span>SARCASMO: {result.tone}/10</span>
+                    <span>•</span>
+                    <span>{new Date(result.id).toLocaleString()}</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 flex-shrink-0">
+                  <button
+                    className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-mono text-xs py-2 px-3 rounded-lg transition-all"
+                    onClick={() => copyResult(result.reply)}
+                  >
+                    COPY
+                  </button>
+                  <button
+                    className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-mono text-xs py-2 px-3 rounded-lg transition-all"
+                    onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))}
+                  >
+                    JSON
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        =        <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <h3 className="text-white font-mono font-bold text-xl tracking-wider mb-4">
+            › HISTÓRICO.DE.JULGAMENTOS
+          </h3>
+
+          {history.length === 0 && (
+            <div className="text-center py-8">
+              <div className="text-4xl mb-2">📚</div>
+              <div className="text-white/50 font-mono text-sm">Histórico vazio — suas ideias aparecerão aqui</div>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {history.map((h, index) => (
+              <div key={h.id} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex-1 space-y-2">
+                    <div className="font-mono font-bold text-white text-sm">
+                      #{history.length - index}: {h.title}
+                    </div>
+                    <div className="text-white/70 font-mono text-xs leading-relaxed">
+                      {h.reply.slice(0, 180)}{h.reply.length > 180 ? "..." : ""}
+                    </div>
+                    <div className="text-white/40 font-mono text-xs">
+                      SARCASMO: {h.tone}/10
+                    </div>
+                  </div>
+                  <div className="text-white/30 font-mono text-xs flex-shrink-0">
+                    {new Date(h.id).toLocaleTimeString()}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        =        <footer className="text-center mt-12 pb-8">
+          <div className="text-white/30 font-mono text-xs tracking-wider">
+            SAAS.VALIDATOR © 2025 — USE.COM.RESPONSABILIDADE 🚀
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }
