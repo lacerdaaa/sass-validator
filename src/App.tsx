@@ -50,26 +50,16 @@ export default function SaasValidator() {
     setLoading(true);
 
     try {
-      const systemPrompt = `Você é um crítico de ideias SaaS com humor ácido e ironia afiada. Sua missão é zoar, tirar sarro e fazer piadas sobre qualquer ideia apresentada, sem papas na língua. Seja engraçado, sarcástico e criativo. Responda sempre em português brasileiro, sem ser sério nem construtivo. Resuma em no máximo 300 caracteres e em PT-BR.`;
+      const systemPrompt = `Você é um crítico de ideias SaaS com humor ácido e ironia afiada. Sua missão é zoar, tirar sarro e fazer piadas sobre qualquer ideia apresentada, sem papas na língua. Seja engraçado, sarcástico e criativo. Responda sempre em português brasileiro, sem ser sério nem construtivo.`;
 
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      const response = await fetch("/api/openai", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer  `
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "gpt-4",
           messages: [
             { role: "system", content: systemPrompt },
-            {
-              role: "user",
-              content: `Analise esta ideia de SaaS:
-
-Título: ${title || "Ideia sem título"}
-Descrição: ${description}
-`
-            }
+            { role: "user", content: `Analise esta ideia de SaaS:\nTítulo: ${title || "Sem título"}\nDescrição: ${description}` }
           ],
           max_tokens: 1000,
           temperature: 0.7
@@ -269,7 +259,30 @@ Descrição: ${description}
               )}
             </div>
           </div>
+
         )}
+
+        <footer className="text-center text-sm text-gray-500 py-4">
+          <div>
+            feito com <span className="line-through">amor</span> sarcasmo por{" "}
+            <a
+              href="https://github.com/lacerdaaa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-green-600"
+            >
+              @lacerdaaa
+            </a>
+          </div>
+          <div className="mt-2">
+            curta o site? financie mais respostas inúteis:{" "}
+            <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+              edulacerdaaa@gmail.com
+            </span>{" "}
+            (pix)
+          </div>
+        </footer>
+
       </div>
 
       <style>{`
