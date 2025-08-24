@@ -276,7 +276,7 @@ export default function Page() {
             </a>
           </div>
           <div className="mt-2">
-            curta o site? financie mais respostas inúteis:{" "}
+            curtiu o site? financie mais respostas inúteis:{" "}
             <span className="font-mono bg-gray-100 px-2 py-1 rounded">
               edulacerdaaa@gmail.com
             </span>{" "}
